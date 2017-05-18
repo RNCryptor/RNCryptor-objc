@@ -466,7 +466,8 @@ static int RN_SecRandomCopyBytes(void *rnd, size_t count, uint8_t *bytes) {
   self.finished = YES;
   if (self.handler) {
     dispatch_sync(self.responseQueue, ^{
-      self.handler(self, self.outData);
+      __weak typeof(self) wself = self;
+      self.handler(wself, wself.outData);
     });
     self.handler = nil;
   }
