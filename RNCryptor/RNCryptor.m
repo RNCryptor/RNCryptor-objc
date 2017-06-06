@@ -58,7 +58,7 @@ const RNCryptorSettings kRNCryptorAES256Settings = {
     }
 };
 
-extern int SecRandomCopyBytes(SecRandomRef rnd, size_t count, uint8_t *bytes) __attribute__((weak_import));
+extern int SecRandomCopyBytes(SecRandomRef __nullable rnd, size_t count, void *bytes) __attribute__((warn_unused_result));
 extern int
 CCKeyDerivationPBKDF( CCPBKDFAlgorithm algorithm, const char *password, size_t passwordLen,
                      const uint8_t *salt, size_t saltLen,
