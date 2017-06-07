@@ -58,7 +58,6 @@ const RNCryptorSettings kRNCryptorAES256Settings = {
     }
 };
 
-extern int SecRandomCopyBytes(SecRandomRef rnd, size_t count, uint8_t *bytes) __attribute__((weak_import));
 extern int
 CCKeyDerivationPBKDF( CCPBKDFAlgorithm algorithm, const char *password, size_t passwordLen,
                      const uint8_t *salt, size_t saltLen,
@@ -331,69 +330,11 @@ RN_CCKeyDerivationPBKDF( CCPBKDFAlgorithm algorithm, const char *password, size_
   return derivedKey;
 }
 
-// For use on OS X 10.6
-// Based on http://www.opensource.apple.com/source/Security/Security-55179.1/sec/Security/SecFramework.c
-// Modified by Rob Napier April, 2013.
-/*
- * Copyright (c) 2006-2010 Apple Inc. All Rights Reserved.
- *
- * @APPLE_LICENSE_HEADER_START@
- *
- * This file contains Original Code and/or Modifications of Original Code
- * as defined in and that are subject to the Apple Public Source License
- * Version 2.0 (the 'License'). You may not use this file except in
- * compliance with the License. Please obtain a copy of the License at
- * http://www.opensource.apple.com/apsl/ and read it before using this
- * file.
- *
- * The Original Code and all software distributed under the License are
- * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
- * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
- * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
- * Please see the License for the specific language governing rights and
- * limitations under the License.
- *
- * @APPLE_LICENSE_HEADER_END@
- */
-static int RN_SecRandomCopyBytes(void *rnd, size_t count, uint8_t *bytes) {
-  static int kSecRandomFD;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    kSecRandomFD = open("/dev/random", O_RDONLY);
-  });
-
-  if (kSecRandomFD < 0)
-    return -1;
-  while (count) {
-    ssize_t bytes_read = read(kSecRandomFD, bytes, count);
-    if (bytes_read == -1) {
-      if (errno == EINTR)
-        continue;
-      return -1;
-    }
-    if (bytes_read == 0) {
-      return -1;
-    }
-    bytes += bytes_read;
-    count -= bytes_read;
-  }
-
-	return 0;
-}
-/* End code dervied from SecFramework.c */
-
 + (NSData *)randomDataOfLength:(size_t)length
 {
   NSMutableData *data = [NSMutableData dataWithLength:length];
 
-  int result;
-  if (SecRandomCopyBytes != NULL) {
-    result = SecRandomCopyBytes(NULL, length, data.mutableBytes);
-  }
-  else {
-    result = RN_SecRandomCopyBytes(NULL, length, data.mutableBytes);
-  }
+  int result = SecRandomCopyBytes(NULL, length, data.mutableBytes);
   NSAssert(result == 0, @"Unable to generate random bytes: %d", errno);
 
   return data;
