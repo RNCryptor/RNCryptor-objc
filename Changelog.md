@@ -1,6 +1,10 @@
+# Version 3.0.6
+
+* Clean up self-retain warnings
+
 # Version 3.0.5
 
-# Clean up warnings for CocoaPods
+* Clean up warnings for CocoaPods
 
 # Version 3.0.4
 
