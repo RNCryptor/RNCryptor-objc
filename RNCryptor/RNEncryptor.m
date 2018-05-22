@@ -199,7 +199,7 @@
       NSData *header = [self header];
       [self.outData setData:header];
       if (self.hasHMAC) {
-        CCHmacUpdate(&_HMACContext, [header bytes], [header length]);
+        CCHmacUpdate(&self->_HMACContext, [header bytes], [header length]);
       }
       self.haveWrittenHeader = YES;
     }
@@ -210,7 +210,7 @@
       [self cleanupAndNotifyWithError:error];
     }
     if (self.hasHMAC) {
-      CCHmacUpdate(&_HMACContext, encryptedData.bytes, encryptedData.length);
+      CCHmacUpdate(&self->_HMACContext, encryptedData.bytes, encryptedData.length);
     }
 
     [self.outData appendData:encryptedData];
@@ -233,9 +233,9 @@
     NSData *encryptedData = [self.engine finishWithError:&error];
     [self.outData appendData:encryptedData];
     if (self.hasHMAC) {
-      CCHmacUpdate(&_HMACContext, encryptedData.bytes, encryptedData.length);
+      CCHmacUpdate(&self->_HMACContext, encryptedData.bytes, encryptedData.length);
       NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
-      CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
+      CCHmacFinal(&self->_HMACContext, [HMACData mutableBytes]);
       [self.outData appendData:HMACData];
     }
     [self cleanupAndNotifyWithError:error];
