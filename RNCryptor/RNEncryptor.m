@@ -100,7 +100,7 @@
                     encryptionKey:(NSData *)anEncryptionKey
                           HMACKey:(NSData *)anHMACKey
                           handler:(RNCryptorHandler)aHandler {
-  return [self initWithSettings:kRNCryptorAES256Settings
+  return [self initWithSettings:theSettings
                   encryptionKey:anEncryptionKey
                         HMACKey:anHMACKey
                              IV:[[self class] randomDataOfLength:theSettings.IVSize]
